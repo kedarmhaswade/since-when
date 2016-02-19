@@ -18,18 +18,24 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        // todo this is *very rudimentary*
+        if (args.length != 2) {
+            System.out.println("Usage: run the jar with two parameters: <path to src.zip> <some-part-of-class-name>");
+            return;
+        }
         File srcZip = new File(args[0]);
-
+        String className = args[1];
         final ZipFile file = new ZipFile(srcZip);
         try {
             final Enumeration<? extends ZipEntry> entries = file.entries();
             while (entries.hasMoreElements()) {
                 final ZipEntry entry = entries.nextElement();
-                if ("java/util/Comparator.java".equals(entry.getName())) {
-                    System.out.println(entry.getName());
+                if (entry.getName().indexOf(className) != -1) {
+                    System.out.println("Class: " + entry.getName());
                     CompilationUnit cu = JavaParser.parse(file.getInputStream(entry));
                     MethodVisitor mv = new MethodVisitor();
                     mv.visit(cu, null);
+                    System.out.println();
                 }
             }
         } finally {
@@ -49,8 +55,8 @@ public class Main {
             Matcher matcher = p.matcher(comment);
             if (matcher.find()) {
                 String v = matcher.group(2);
-                if ("1.8".equals(v)) {
-                    System.out.println((num + 1) + ": " + md.getDeclarationAsString() + " since: " + v);
+                if ("1.8".equals(v)) { //todo 1.8 is hardcoded
+                    System.out.println("\t" + (num + 1) + ": " + md.getDeclarationAsString() + " since: " + v);
                     num += 1;
                 }
             }
