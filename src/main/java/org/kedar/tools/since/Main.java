@@ -25,10 +25,12 @@ public class Main {
             final Enumeration<? extends ZipEntry> entries = file.entries();
             while (entries.hasMoreElements()) {
                 final ZipEntry entry = entries.nextElement();
-                System.out.println(entry.getName());
-                CompilationUnit cu = JavaParser.parse(file.getInputStream(entry));
-                MethodVisitor mv = new MethodVisitor();
-                mv.visit(cu, null);
+                if ("java/util/Comparator.java".equals(entry.getName())) {
+                    System.out.println(entry.getName());
+                    CompilationUnit cu = JavaParser.parse(file.getInputStream(entry));
+                    MethodVisitor mv = new MethodVisitor();
+                    mv.visit(cu, null);
+                }
             }
         } finally {
             file.close();
