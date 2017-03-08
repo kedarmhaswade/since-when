@@ -19,32 +19,36 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // todo this is *very rudimentary*
-        if (args.length != 2) {
-            System.out.println("Usage: run the jar with two parameters: <path to src.zip> <some-part-of-class-name>");
+        if (args.length != 3) {
+            System.out.println("Usage: run the jar with two parameters: <path to src.zip> <some-part-of-class-name> <sinceVersion>");
             return;
         }
         File srcZip = new File(args[0]);
         String className = args[1];
-        final ZipFile file = new ZipFile(srcZip);
-        try {
+        String sinceVersion = args[2];
+        System.out.println("Methods since: " + sinceVersion);
+        try (ZipFile file = new ZipFile(srcZip)) {
             final Enumeration<? extends ZipEntry> entries = file.entries();
             while (entries.hasMoreElements()) {
                 final ZipEntry entry = entries.nextElement();
-                if (entry.getName().indexOf(className) != -1) {
+                if (entry.getName().contains(className)) {
                     System.out.println("Class: " + entry.getName());
                     CompilationUnit cu = JavaParser.parse(file.getInputStream(entry));
-                    MethodVisitor mv = new MethodVisitor();
+                    MethodVisitor mv = new MethodVisitor(sinceVersion);
                     mv.visit(cu, null);
                     System.out.println();
                 }
             }
-        } finally {
-            file.close();
         }
     }
 
     private static class MethodVisitor extends VoidVisitorAdapter {
+        private final String sinceVersion;
         int num = 0;
+
+        public MethodVisitor(String sinceVersion) {
+            this.sinceVersion = sinceVersion;
+        }
 
         @Override
         public void visit(MethodDeclaration md, Object arg) {
@@ -55,7 +59,7 @@ public class Main {
             Matcher matcher = p.matcher(comment);
             if (matcher.find()) {
                 String v = matcher.group(2);
-                if ("1.8".equals(v)) { //todo 1.8 is hardcoded
+                if (sinceVersion.equals(v)) {
                     System.out.println("\t" + (num + 1) + ": " + md.getDeclarationAsString() + " since: " + v);
                     num += 1;
                 }
