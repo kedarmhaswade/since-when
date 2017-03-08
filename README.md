@@ -6,8 +6,6 @@ In a way, this is just regex parsing with @since, but I wanted to try out the ja
 
 ## Instructions
 
-Java 8 is needed. Other than that ...
+JDK 8 and mvn are needed. And you also need the **src.zip** that comes with any JDK installation. Clone the repo and run the script sw.sh.
 
-1. mvn install
-2. copy src.zip to some folder or remember a path to it.
-3. java -jar target/java-jar-source-since-final.jar path-to-jar some-kind-of-class-name
+https://asciinema.org/a/a4t5mlpmtzlrdt5h9mxhq4ttj
